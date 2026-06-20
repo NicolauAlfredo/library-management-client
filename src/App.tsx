@@ -1,9 +1,9 @@
+import { RouterProvider } from "react-router-dom";
+import { Router } from "react-router-dom";
+import { router } from "./routes/app.routes";
+
 function App() {
-  return (
-    <>
-      <h1>Library Management Client</h1>
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
