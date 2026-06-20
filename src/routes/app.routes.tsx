@@ -7,7 +7,6 @@ import { DashboardPage } from "../pages/dashboard/DashboardPage";
 import { BooksPage } from "../pages/books/BooksPage";
 import { UsersPage } from "../pages/users/UsersPage";
 import { LoansPage } from "../pages/loans/LoansPage";
-import path from "path";
 
 export const router = createBrowserRouter([
   {

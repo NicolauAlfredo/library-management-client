@@ -10,7 +10,7 @@ interface ApiResponse<T> {
 
 export async function loginRequest(data: LoginRequest): Promise<AuthResponse> {
   const response = await api.post<ApiResponse<AuthResponse>>(
-    " /auth/login",
+    "/auth/login",
     data,
   );
 
