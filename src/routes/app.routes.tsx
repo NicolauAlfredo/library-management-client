@@ -7,6 +7,7 @@ import { DashboardPage } from "../pages/dashboard/DashboardPage";
 import { BooksPage } from "../pages/books/BooksPage";
 import { UsersPage } from "../pages/users/UsersPage";
 import { LoansPage } from "../pages/loans/LoansPage";
+import { AppLayout } from "../components/layout/AppLayout";
 
 export const router = createBrowserRouter([
   {
@@ -17,20 +18,25 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
-        path: "/",
-        element: <DashboardPage />,
-      },
-      {
-        path: "/books",
-        element: <BooksPage />,
-      },
-      {
-        path: "/users",
-        element: <UsersPage />,
-      },
-      {
-        path: "/loans",
-        element: <LoansPage />,
+        element: <AppLayout />,
+        children: [
+          {
+            path: "/",
+            element: <DashboardPage />,
+          },
+          {
+            path: "/books",
+            element: <BooksPage />,
+          },
+          {
+            path: "/users",
+            element: <UsersPage />,
+          },
+          {
+            path: "/loans",
+            element: <LoansPage />,
+          },
+        ],
       },
     ],
   },
