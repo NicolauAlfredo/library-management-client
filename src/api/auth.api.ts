@@ -8,7 +8,7 @@ interface ApiResponse<T> {
   data: T;
 }
 
-export async function loginResquest(data: LoginRequest): Promise<AuthResponse> {
+export async function loginRequest(data: LoginRequest): Promise<AuthResponse> {
   const response = await api.post<ApiResponse<AuthResponse>>(
     " /auth/login",
     data,
@@ -17,7 +17,7 @@ export async function loginResquest(data: LoginRequest): Promise<AuthResponse> {
   return response.data.data;
 }
 
-export async function getProfieRequest(): Promise<User> {
+export async function getProfileRequest(): Promise<User> {
   const response = await api.get<ApiResponse<User>>("/auth/profile");
 
   return response.data.data;
