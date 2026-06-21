@@ -7,6 +7,7 @@ import type {
 } from "../types/auth";
 
 import type { User } from "../types/user";
+import type { ForgotPasswordFormData } from "../pages/forgot-password/forgot-password.schema";
 
 interface ApiResponse<T> {
   success: boolean;
@@ -59,8 +60,8 @@ export async function getProfileRequest(): Promise<User> {
   return response.data.data;
 }
 
-export interface ForgotPasswordData {
-  email: string;
+export interface ForgotPasswordResponse {
+  resetUrl: string | null;
 }
 
 export interface ResetPasswordData {
@@ -72,15 +73,14 @@ export interface ForgotPasswordResponse {
   resetUrl: string | null;
 }
 
-export async function forgotPasswordRequest(
-  data: ForgotPasswordData,
-): Promise<ForgotPasswordResponse> {
-  const response = await api.post<ApiResponse<ForgotPasswordResponse>>(
-    "/auth/forgot-password",
-    data,
-  );
+export interface ForgotPasswordResponse {
+  resetUrl: string | null;
+}
 
-  return response.data.data;
+export async function forgotPasswordRequest(
+  data: ForgotPasswordFormData,
+): Promise<void> {
+  await api.post("/auth/forgot-password", data);
 }
 
 export async function resetPasswordRequest(

@@ -15,8 +15,6 @@ import { forgotPasswordSchema } from "./forgot-password.schema";
 import type { ForgotPasswordFormData } from "./forgot-password.schema";
 
 export function ForgotPasswordPage() {
-  const [resetUrl, setResetUrl] = useState<string | null>(null);
-
   const {
     register,
     handleSubmit,
@@ -27,11 +25,9 @@ export function ForgotPasswordPage() {
 
   async function onSubmit(data: ForgotPasswordFormData) {
     try {
-      const response = await forgotPasswordRequest(data);
+      await forgotPasswordRequest(data);
 
-      setResetUrl(response.resetUrl);
-
-      toast.success("Password recovery request sent");
+      toast.success("If this email is registered, a reset link will be sent.");
     } catch (error) {
       toast.error(
         getApiErrorMessage(error, "Failed to request password reset"),
@@ -64,16 +60,6 @@ export function ForgotPasswordPage() {
             {isSubmitting ? "Sending..." : "Send reset link"}
           </Button>
         </form>
-
-        {resetUrl && (
-          <div className="mt-6 rounded-md bg-blue-50 p-3 text-sm text-blue-700">
-            <p className="font-medium">Development reset link:</p>
-
-            <Link to={new URL(resetUrl).pathname + new URL(resetUrl).search}>
-              Open reset password page
-            </Link>
-          </div>
-        )}
 
         <p className="mt-6 text-center text-sm text-gray-500">
           Remember your password?{" "}
