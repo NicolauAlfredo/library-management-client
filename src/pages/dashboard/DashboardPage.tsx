@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { getAdminDashboardStats } from "../../api/dashboard.api";
+import { Card } from "../../components/ui/Card";
+import { Loading } from "../../components/ui/Loading";
+import { ErrorMessage } from "../../components/ui/ErrorMessage";
 
 export function DashboardPage() {
   const { data, isLoading, isError } = useQuery({
@@ -8,47 +12,65 @@ export function DashboardPage() {
   });
 
   if (isLoading) {
-    return <p>Loading dashboard...</p>;
+    return <Loading message="Loading dashboard..." />;
   }
 
   if (isError) {
-    return <p>Failed to load dashboard.</p>;
+    return <ErrorMessage message="Failed to load dashboard." />;
   }
 
   return (
-    <section>
-      <h1>Dashboard</h1>
-
+    <section className="space-y-6">
       <div>
-        <article>
-          <h2>Total Users</h2>
-          <p>{data?.totalUsers}</p>
-        </article>
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-sm text-gray-500">
+          {" "}
+          Overview of your library management system.
+        </p>
+      </div>
 
-        <article>
-          <h2>Total Books</h2>
-          <p>{data?.totalBooks}</p>
-        </article>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <p className="text-sm text-gray-500">Total Users</p>
+          <strong className="text-3xl font-bold text-gray-900">
+            {data?.totalUsers}
+          </strong>
+        </Card>
 
-        <article>
-          <h2>Available Books</h2>
-          <p>{data?.totalAvailableBooks}</p>
-        </article>
+        <Card>
+          <p className="text-sm text-gray-500">Total Books</p>
+          <strong className="text-3xl font-bold text-gray-900">
+            {data?.totalBooks}
+          </strong>
+        </Card>
 
-        <article>
-          <h2>Active Loans</h2>
-          <p>{data?.activeLoans}</p>
-        </article>
+        <Card>
+          <p className="text-sm text-gray-500">Available Books</p>
+          <strong className="text-3xl font-bold text-gray-900">
+            {data?.totalAvailableBooks}
+          </strong>
+        </Card>
 
-        <article>
-          <h2>Returned Loans</h2>
-          <p>{data?.returnedLoans}</p>
-        </article>
+        <Card>
+          <p className="text-sm text-gray-500"> Active Loans</p>
+          <strong className="text-3xl font-bold text-gray-900">
+            {data?.activeLoans}
+          </strong>
+        </Card>
 
-        <article>
-          <h2>Late Loans</h2>
-          <p>{data?.lateLoans}</p>
-        </article>
+        <Card>
+          <p className="text-sm text-gray-500">Returned Loans</p>
+          <strong className="text-3xl font-bold text-gray-900">
+            {data?.returnedLoans}
+          </strong>
+        </Card>
+
+        <Card>
+          <p className="text-sm text-gray-500">Late Loans</p>
+          <strong className="text-3xl font-bold text-red-600">
+            {data?.lateLoans}
+          </strong>
+        </Card>
       </div>
     </section>
   );
