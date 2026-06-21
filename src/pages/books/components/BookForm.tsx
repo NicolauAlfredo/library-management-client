@@ -1,10 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
+import { Button } from "../../../components/ui/Button";
+import { Input } from "../../../components/ui/Input";
+
 import { bookSchema } from "../book.schema";
 
 import type { BookFormData, BookFormInput } from "../book.schema";
-
 import type { Book } from "../../../types/book";
 
 interface BookFormProps {
@@ -35,26 +37,58 @@ export function BookForm({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <input placeholder="Title" {...register("title")} />
-      {errors.title && <p>{errors.title.message}</p>}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2">
+        <Input
+          label="Title"
+          placeholder="Clean Code"
+          error={errors.title?.message}
+          {...register("title")}
+        />
 
-      <input placeholder="Author" {...register("author")} />
-      {errors.author && <p>{errors.author.message}</p>}
+        <Input
+          label="Author"
+          placeholder="Robert C. Martin"
+          error={errors.author?.message}
+          {...register("author")}
+        />
 
-      <input placeholder="Category" {...register("category")} />
+        <Input
+          label="Category"
+          placeholder="Software Engineering"
+          error={errors.category?.message}
+          {...register("category")}
+        />
 
-      <input placeholder="ISBN" {...register("isbn")} />
+        <Input
+          label="ISBN"
+          placeholder="9780132350884"
+          error={errors.isbn?.message}
+          {...register("isbn")}
+        />
 
-      <input placeholder="Cover URL" {...register("coverUrl")} />
-      {errors.coverUrl && <p>{errors.coverUrl.message}</p>}
+        <Input
+          label="Cover URL"
+          placeholder="https://covers.openlibrary.org/b/isbn/9780132350884-L.jpg"
+          error={errors.coverUrl?.message}
+          {...register("coverUrl")}
+          className="md:col-span-2"
+        />
 
-      <input type="number" placeholder="Quantity" {...register("quantity")} />
-      {errors.quantity && <p>{errors.quantity.message}</p>}
+        <Input
+          label="Quantity"
+          type="number"
+          placeholder="5"
+          error={errors.quantity?.message}
+          {...register("quantity")}
+        />
+      </div>
 
-      <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Saving..." : "Save Book"}
-      </button>
+      <div className="flex justify-end">
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Saving..." : "Save Book"}
+        </Button>
+      </div>
     </form>
   );
 }
