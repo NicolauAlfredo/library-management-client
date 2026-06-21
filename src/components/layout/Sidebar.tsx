@@ -18,6 +18,7 @@ export function Sidebar({ mobile = false, onNavigate }: SidebarProps) {
     ...(isAdmin
       ? [{ to: "/loans", label: "Loans" }]
       : [{ to: "/my-loans", label: "My Loans" }]),
+    { to: "/profile", label: "Profile" },
   ];
 
   return (

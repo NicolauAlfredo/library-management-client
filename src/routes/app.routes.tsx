@@ -13,6 +13,7 @@ import { AdminRoute } from "../components/protected-route/AdminRoute";
 import { MyLoansPage } from "../pages/my-loans/MyLoansPage";
 import { RegisterPage } from "../pages/register/RegisterPage";
 import { BookDetailsPage } from "../pages/books/BookDetailsPage";
+import { ProfilePage } from "../pages/profile/ProfilePage";
 
 export const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ export const router = createBrowserRouter([
           {
             path: "/",
             element: <HomeRedirect />,
+          },
+          {
+            path: "/profile",
+            element: <ProfilePage />,
           },
           {
             path: "/dashboard",
