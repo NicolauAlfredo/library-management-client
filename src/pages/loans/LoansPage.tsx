@@ -6,7 +6,12 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { getLoans, returnBook, updateOverdueLoans } from "../../api/loans.api";
+import {
+  getLoans,
+  getMyLoans,
+  returnBook,
+  updateOverdueLoans,
+} from "../../api/loans.api";
 import { getApiErrorMessage } from "../../utils/get-api-error-message";
 
 import type { Loan, LoanStatus } from "../../types/loan";
@@ -19,6 +24,7 @@ import { Input } from "../../components/ui/Input";
 import { Loading } from "../../components/ui/Loading";
 import { Select } from "../../components/ui/Select";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
+import { useAuth } from "../../contexts/auth.context";
 
 export function LoansPage() {
   const queryClient = useQueryClient();
@@ -29,15 +35,20 @@ export function LoansPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loanToReturn, setLoanToReturn] = useState<Loan | null>(null);
 
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
+
   const { data, isLoading, isError, isFetching } = useQuery({
-    queryKey: ["loans", page, status, search],
+    queryKey: ["loans", page, status, search, isAdmin],
     queryFn: () =>
-      getLoans({
-        page,
-        limit: 10,
-        status: status || undefined,
-        search: search || undefined,
-      }),
+      isAdmin
+        ? getLoans({
+            page,
+            limit: 10,
+            status: status || undefined,
+            search: search || undefined,
+          })
+        : getMyLoans(),
     placeholderData: keepPreviousData,
   });
 
@@ -86,44 +97,48 @@ export function LoansPage() {
           </p>
         </div>
 
-        <Button
-          type="button"
-          onClick={() => updateOverdueMutation.mutate()}
-          disabled={updateOverdueMutation.isPending}
-        >
-          {updateOverdueMutation.isPending
-            ? "Updating..."
-            : "Update overdue loans"}
-        </Button>
+        {isAdmin && (
+          <Button
+            type="button"
+            onClick={() => updateOverdueMutation.mutate()}
+            disabled={updateOverdueMutation.isPending}
+          >
+            {updateOverdueMutation.isPending
+              ? "Updating..."
+              : "Update overdue loans"}
+          </Button>
+        )}
       </div>
 
       {errorMessage && <ErrorMessage message={errorMessage} />}
 
-      <Card>
-        <div className="grid gap-4 md:grid-cols-2">
-          <Input
-            placeholder="Search by user, email or book"
-            value={search}
-            onChange={(event) => {
-              setSearch(event.target.value);
-              setPage(1);
-            }}
-          />
+      {isAdmin && (
+        <Card>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Input
+              placeholder="Search by user, email or book"
+              value={search}
+              onChange={(event) => {
+                setSearch(event.target.value);
+                setPage(1);
+              }}
+            />
 
-          <Select
-            value={status}
-            onChange={(event) => {
-              setStatus(event.target.value as LoanStatus | "");
-              setPage(1);
-            }}
-          >
-            <option value="">All status</option>
-            <option value="ACTIVE">Active</option>
-            <option value="RETURNED">Returned</option>
-            <option value="LATE">Late</option>
-          </Select>
-        </div>
-      </Card>
+            <Select
+              value={status}
+              onChange={(event) => {
+                setStatus(event.target.value as LoanStatus | "");
+                setPage(1);
+              }}
+            >
+              <option value="">All status</option>
+              <option value="ACTIVE">Active</option>
+              <option value="RETURNED">Returned</option>
+              <option value="LATE">Late</option>
+            </Select>
+          </div>
+        </Card>
+      )}
 
       {isFetching && (
         <p className="text-sm text-gray-500">Updating results...</p>

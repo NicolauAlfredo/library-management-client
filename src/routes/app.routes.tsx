@@ -8,6 +8,8 @@ import { BooksPage } from "../pages/books/BooksPage";
 import { UsersPage } from "../pages/users/UsersPage";
 import { LoansPage } from "../pages/loans/LoansPage";
 import { AppLayout } from "../components/layout/AppLayout";
+import { HomeRedirect } from "./HomeRedirect";
+import { AdminRoute } from "../components/protected-route/AdminRoute";
 
 export const router = createBrowserRouter([
   {
@@ -22,7 +24,15 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "/",
-            element: <DashboardPage />,
+            element: <HomeRedirect />,
+          },
+          {
+            path: "/dashboard",
+            element: (
+              <AdminRoute>
+                <DashboardPage />
+              </AdminRoute>
+            ),
           },
           {
             path: "/books",

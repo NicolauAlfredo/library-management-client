@@ -1,13 +1,18 @@
 import { NavLink } from "react-router-dom";
-
-const links = [
-  { to: "/", label: "Dashboard" },
-  { to: "/books", label: "Books" },
-  { to: "/users", label: "users" },
-  { to: "/loans", label: "Loans" },
-];
+import { useAuth } from "../../hooks/use-auth";
 
 export function Sidebar() {
+  const { user } = useAuth();
+
+  const isAdmin = user?.role === "ADMIN";
+
+  const links = [
+    ...(isAdmin ? [{ to: "/", label: "Dashboard" }] : []),
+    { to: "/books", label: "Books" },
+    ...(isAdmin ? [{ to: "/users", label: "Users" }] : []),
+    { to: "/loans", label: isAdmin ? "Loans" : "My Loans" },
+  ];
+
   return (
     <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-gray-200 bg-white px-4 py-6 lg:block">
       <h1 className="mb-8 text-xl font-bold text-gray-900">Library Admin</h1>

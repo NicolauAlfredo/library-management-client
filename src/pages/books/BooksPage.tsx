@@ -29,6 +29,7 @@ import { BookForm } from "./components/BookForm";
 import type { Book } from "../../types/book";
 import type { BookFormData } from "./book.schema";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
+import { useAuth } from "../../contexts/auth.context";
 
 export function BooksPage() {
   const [page, setPage] = useState(1);
@@ -140,6 +141,10 @@ export function BooksPage() {
     return <ErrorMessage message="Failed to load books." />;
   }
 
+  const { user } = useAuth();
+
+  const isAdmin = user?.role === "ADMIN";
+
   return (
     <section className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -150,16 +155,18 @@ export function BooksPage() {
           </p>
         </div>
 
-        <Button
-          type="button"
-          onClick={() => {
-            setSelectedBook(null);
-            setIsFormOpen((current) => !current);
-            setErrorMessage("");
-          }}
-        >
-          {isFormOpen ? "Close Form" : "Add Book"}
-        </Button>
+        {isAdmin && (
+          <Button
+            type="button"
+            onClick={() => {
+              setSelectedBook(null);
+              setIsFormOpen((current) => !current);
+              setErrorMessage("");
+            }}
+          >
+            {isFormOpen ? "Close Form" : "Add Book"}
+          </Button>
+        )}
       </div>
 
       {errorMessage && <ErrorMessage message={errorMessage} />}
@@ -208,7 +215,7 @@ export function BooksPage() {
         </div>
       </Card>
 
-      {isFormOpen && (
+      {isAdmin && isFormOpen && (
         <Card>
           <h2 className="mb-4 text-lg font-semibold text-gray-900">
             {selectedBook ? "Update Book" : "Create Book"}
@@ -261,36 +268,41 @@ export function BooksPage() {
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    setSelectedBook(book);
-                    setIsFormOpen(true);
-                    setErrorMessage("");
-                  }}
-                >
-                  Edit
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="danger"
-                  onClick={() => setBookToDelete(book)}
-                  disabled={deleteBookMutation.isPending}
-                >
-                  Delete
-                </Button>
-
-                <Button
-                  type="button"
-                  disabled={
-                    book.availableQuantity === 0 || borrowBookMutation.isPending
-                  }
-                  onClick={() => borrowBookMutation.mutate(book.id)}
-                >
-                  {book.availableQuantity === 0 ? "Unavailable" : "Borrow"}
-                </Button>
+                {isAdmin && (
+                  <>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => {
+                        setSelectedBook(book);
+                        setIsFormOpen(true);
+                        setErrorMessage("");
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      onClick={() => setBookToDelete(book)}
+                      disabled={deleteBookMutation.isPending}
+                    >
+                      Delete
+                    </Button>
+                  </>
+                )}
+                {user?.role === "USER" && (
+                  <Button
+                    type="button"
+                    disabled={
+                      book.availableQuantity === 0 ||
+                      borrowBookMutation.isPending
+                    }
+                    onClick={() => borrowBookMutation.mutate(book.id)}
+                  >
+                    {book.availableQuantity === 0 ? "Unavailable" : "Borrow"}
+                  </Button>
+                )}
               </div>
             </Card>
           ))}
