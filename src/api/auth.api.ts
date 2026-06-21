@@ -1,6 +1,10 @@
 import { api } from "./axios";
 
-import type { AuthResponse, LoginRequest } from "../types/auth";
+import type {
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest,
+} from "../types/auth";
 import type { User } from "../types/user";
 
 interface ApiResponse<T> {
@@ -11,6 +15,17 @@ interface ApiResponse<T> {
 export async function loginRequest(data: LoginRequest): Promise<AuthResponse> {
   const response = await api.post<ApiResponse<AuthResponse>>(
     "/auth/login",
+    data,
+  );
+
+  return response.data.data;
+}
+
+export async function registerRequest(
+  data: RegisterRequest,
+): Promise<AuthResponse> {
+  const response = await api.post<ApiResponse<AuthResponse>>(
+    "/auth/register",
     data,
   );
 
