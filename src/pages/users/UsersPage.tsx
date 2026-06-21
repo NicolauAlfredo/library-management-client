@@ -1,4 +1,4 @@
-import { use, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { deleteUser, getUsers, updateUser } from "../../api/users.api";
@@ -13,6 +13,7 @@ import { Loading } from "../../components/ui/Loading";
 import { Select } from "../../components/ui/Select";
 
 import type { Role, User } from "../../types/user";
+import { ConfirmModal } from "../../components/ui/ConfirmModal";
 
 export function UsersPage() {
   const queryClient = useQueryClient();
@@ -21,6 +22,7 @@ export function UsersPage() {
   const [search, setSearch] = useState("");
   const [role, setRole] = useState<Role | "">("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["users", page, search, role],
@@ -72,7 +74,7 @@ export function UsersPage() {
   }
 
   if (isError) {
-    return <Loading message="Failed to load users." />;
+    return <ErrorMessage message="Failed to load users." />;
   }
 
   return (
@@ -141,7 +143,10 @@ export function UsersPage() {
                   <Button
                     type="button"
                     variant="danger"
-                    onClick={() => deleteUserMutation.mutate(user.id)}
+                    onClick={() => {
+                      setErrorMessage("");
+                      setUserToDelete(user);
+                    }}
                     disabled={deleteUserMutation.isPending}
                   >
                     Delete
@@ -181,6 +186,22 @@ export function UsersPage() {
           </Button>
         </div>
       </Card>
+
+      <ConfirmModal
+        isOpen={!!userToDelete}
+        title="Delete user"
+        message={`Are you sure you want to delete "${userToDelete?.name}"?`}
+        confirmLabel="Delete"
+        isLoading={deleteUserMutation.isPending}
+        onCancel={() => setUserToDelete(null)}
+        onConfirm={() => {
+          if (userToDelete) {
+            deleteUserMutation.mutate(userToDelete.id, {
+              onSuccess: () => setUserToDelete(null),
+            });
+          }
+        }}
+      />
     </section>
   );
 }

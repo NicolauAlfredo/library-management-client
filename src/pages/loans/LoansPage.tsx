@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getLoans, returnBook, updateOverdueLoans } from "../../api/loans.api";
 import { getApiErrorMessage } from "../../utils/get-api-error-message";
 
-import type { LoanStatus } from "../../types/loan";
+import type { Loan, LoanStatus } from "../../types/loan";
 
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
@@ -13,6 +13,7 @@ import { ErrorMessage } from "../../components/ui/ErrorMessage";
 import { Input } from "../../components/ui/Input";
 import { Loading } from "../../components/ui/Loading";
 import { Select } from "../../components/ui/Select";
+import { ConfirmModal } from "../../components/ui/ConfirmModal";
 
 export function LoansPage() {
   const queryClient = useQueryClient();
@@ -21,6 +22,7 @@ export function LoansPage() {
   const [status, setStatus] = useState<LoanStatus | "">("");
   const [search, setSearch] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loanToReturn, setLoanToReturn] = useState<Loan | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["loans", page, status, search],
@@ -147,8 +149,7 @@ export function LoansPage() {
                     <Button
                       type="button"
                       variant="secondary"
-                      onClick={() => returnLoanMutation.mutate(loan.id)}
-                      disabled={returnLoanMutation.isPending}
+                      onClick={() => setLoanToReturn(loan)}
                     >
                       Return book
                     </Button>
@@ -188,6 +189,26 @@ export function LoansPage() {
           </Button>
         </div>
       </Card>
+
+      <ConfirmModal
+        isOpen={!!loanToReturn}
+        title="Return book"
+        message={`Are you sure you want to return "${
+          loanToReturn?.bookTitle ?? `Book #${loanToReturn?.bookId}`
+        }"?`}
+        confirmLabel="Return"
+        isLoading={returnLoanMutation.isPending}
+        onCancel={() => setLoanToReturn(null)}
+        onConfirm={() => {
+          if (!loanToReturn) return;
+
+          returnLoanMutation.mutate(loanToReturn.id, {
+            onSuccess: () => {
+              setLoanToReturn(null);
+            },
+          });
+        }}
+      />
     </section>
   );
 }

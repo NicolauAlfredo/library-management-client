@@ -23,6 +23,7 @@ import { BookForm } from "./components/BookForm";
 
 import type { Book } from "../../types/book";
 import type { BookFormData } from "./book.schema";
+import { ConfirmModal } from "../../components/ui/ConfirmModal";
 
 export function BooksPage() {
   const [page, setPage] = useState(1);
@@ -33,6 +34,7 @@ export function BooksPage() {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -264,7 +266,7 @@ export function BooksPage() {
                 <Button
                   type="button"
                   variant="danger"
-                  onClick={() => deleteBookMutation.mutate(book.id)}
+                  onClick={() => setBookToDelete(book)}
                   disabled={deleteBookMutation.isPending}
                 >
                   Delete
@@ -313,6 +315,22 @@ export function BooksPage() {
           </Button>
         </div>
       </Card>
+
+      <ConfirmModal
+        isOpen={!!bookToDelete}
+        title="Delete book"
+        message={`Are you sure you want to delete "${bookToDelete?.title}"?`}
+        confirmLabel="Delete"
+        isLoading={deleteBookMutation.isPending}
+        onCancel={() => setBookToDelete(null)}
+        onConfirm={() => {
+          if (bookToDelete) {
+            deleteBookMutation.mutate(bookToDelete.id, {
+              onSuccess: () => setBookToDelete(null),
+            });
+          }
+        }}
+      />
     </section>
   );
 }
