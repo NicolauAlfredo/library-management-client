@@ -5,11 +5,17 @@ import type {
   LoginRequest,
   RegisterRequest,
 } from "../types/auth";
+
 import type { User } from "../types/user";
 
 interface ApiResponse<T> {
   success: boolean;
   data: T;
+}
+
+export interface ChangePasswordData {
+  currentPassword: string;
+  newPassword: string;
 }
 
 export async function loginRequest(data: LoginRequest): Promise<AuthResponse> {
@@ -39,6 +45,12 @@ export async function updateProfileRequest(data: {
   const response = await api.patch<ApiResponse<User>>("/auth/profile", data);
 
   return response.data.data;
+}
+
+export async function changePasswordRequest(
+  data: ChangePasswordData,
+): Promise<void> {
+  await api.patch("/auth/change-password", data);
 }
 
 export async function getProfileRequest(): Promise<User> {

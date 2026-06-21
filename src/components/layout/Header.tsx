@@ -1,6 +1,7 @@
 import { Menu } from "lucide-react";
 import { useAuth } from "../../hooks/use-auth";
 import { Button } from "../ui/Button";
+import { Link } from "react-router-dom";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -27,14 +28,14 @@ export function Header({ onMenuClick }: HeaderProps) {
 
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-sm font-bold text-blue-600">
-              {initials}
+              <Link to="/profile">{initials}</Link>
             </div>
 
             <div>
               <p className="text-sm text-blue-100">Signed in as</p>
 
               <strong className="text-sm font-semibold text-white">
-                {user?.name}
+                <Link to="/profile"> {user?.name}</Link>
               </strong>
             </div>
           </div>

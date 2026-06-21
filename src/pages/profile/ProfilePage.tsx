@@ -12,7 +12,13 @@ import { Input } from "../../components/ui/Input";
 
 import { profileSchema } from "./profile.schema";
 import type { ProfileFormData } from "./profile.schema";
-import { updateProfileRequest } from "../../api/auth.api";
+import {
+  changePasswordRequest,
+  updateProfileRequest,
+} from "../../api/auth.api";
+
+import { changePasswordSchema } from "./change-password.schema";
+import type { ChangePasswordFormData } from "./change-password.schema";
 
 export function ProfilePage() {
   const { user, updateAuthenticatedUser } = useAuth();
@@ -58,6 +64,35 @@ export function ProfilePage() {
 
   function onSubmit(data: ProfileFormData) {
     updateProfileMutation.mutate(data);
+  }
+
+  const {
+    register: registerPassword,
+    handleSubmit: handleSubmitPassword,
+    reset: resetPasswordForm,
+    formState: { errors: passwordErrors },
+  } = useForm<ChangePasswordFormData>({
+    resolver: zodResolver(changePasswordSchema),
+  });
+
+  const changePasswordMutation = useMutation({
+    mutationFn: changePasswordRequest,
+
+    onSuccess: () => {
+      toast.success("Password changed successfully");
+      resetPasswordForm();
+    },
+
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, "Failed to change password"));
+    },
+  });
+
+  function onSubmitPassword(data: ChangePasswordFormData) {
+    changePasswordMutation.mutate({
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+    });
   }
 
   return (
@@ -109,6 +144,50 @@ export function ProfilePage() {
           <div className="flex justify-end">
             <Button type="submit" disabled={updateProfileMutation.isPending}>
               {updateProfileMutation.isPending ? "Saving..." : "Save changes"}
+            </Button>
+          </div>
+        </form>
+      </Card>
+
+      <Card>
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-gray-900">Security</h2>
+          <p className="text-sm text-gray-500">Change your account password.</p>
+        </div>
+
+        <form
+          onSubmit={handleSubmitPassword(onSubmitPassword)}
+          className="space-y-4"
+        >
+          <Input
+            label="Current Password"
+            type="password"
+            autoComplete="current-password"
+            error={passwordErrors.currentPassword?.message}
+            {...registerPassword("currentPassword")}
+          />
+
+          <Input
+            label="New Password"
+            type="password"
+            autoComplete="new-password"
+            error={passwordErrors.newPassword?.message}
+            {...registerPassword("newPassword")}
+          />
+
+          <Input
+            label="Confirm New Password"
+            type="password"
+            autoComplete="new-password"
+            error={passwordErrors.confirmPassword?.message}
+            {...registerPassword("confirmPassword")}
+          />
+
+          <div className="flex justify-end">
+            <Button type="submit" disabled={changePasswordMutation.isPending}>
+              {changePasswordMutation.isPending
+                ? "Changing..."
+                : "Change password"}
             </Button>
           </div>
         </form>
