@@ -25,7 +25,7 @@ export async function getBooks(filters: BookFilters = {}) {
   return response.data;
 }
 
-export async function CreateBook(data: CreateBookData): Promise<Book> {
+export async function createBook(data: CreateBookData): Promise<Book> {
   const response = await api.post<ApiResponse<Book>>("/books", data);
 
   return response.data.data;
