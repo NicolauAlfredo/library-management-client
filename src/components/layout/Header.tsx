@@ -26,7 +26,9 @@ export function Header({ onMenuClick }: HeaderProps) {
           </div>
         </div>
 
-        <Button onClick={logout}>Logout</Button>
+        <Button variant="secondary" onClick={logout}>
+          Logout
+        </Button>
       </div>
     </header>
   );
