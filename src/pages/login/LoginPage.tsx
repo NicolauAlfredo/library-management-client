@@ -57,6 +57,7 @@ export function LoginPage() {
           <Input
             label="Email"
             type="email"
+            autoComplete="email"
             placeholder="admin@library.com"
             error={errors.email?.message}
             {...register("email")}
@@ -66,6 +67,7 @@ export function LoginPage() {
             label="Password"
             type="password"
             placeholder="Your password"
+            autoComplete="current-password"
             error={errors.password?.message}
             {...register("password")}
           />

@@ -29,12 +29,17 @@ export function RegisterPage() {
   });
 
   async function onSubmit(data: RegisterFormData) {
+    console.log("FORM SUBMITTED", data);
+
     try {
       await registerUser(data);
 
-      setErrorMessage("");
+      console.log("REGISTER SUCCESS");
+
       navigate("/books");
     } catch (error) {
+      console.error("REGISTER ERROR", error);
+
       setErrorMessage(getApiErrorMessage(error, "Failed to create account"));
     }
   }
@@ -61,6 +66,7 @@ export function RegisterPage() {
             label="Name"
             type="text"
             placeholder="John Doe"
+            autoComplete="name"
             error={errors.name?.message}
             {...register("name")}
           />
@@ -69,6 +75,7 @@ export function RegisterPage() {
             label="Email"
             type="email"
             placeholder="john@example.com"
+            autoComplete="email"
             error={errors.email?.message}
             {...register("email")}
           />
@@ -77,6 +84,7 @@ export function RegisterPage() {
             label="Password"
             type="password"
             placeholder="Create a password"
+            autoComplete="new-password"
             error={errors.password?.message}
             {...register("password")}
           />

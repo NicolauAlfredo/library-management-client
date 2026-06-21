@@ -19,6 +19,10 @@ export const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
+    path: "/register",
+    element: <RegisterPage />,
+  },
+  {
     element: <ProtectedRoute />,
     children: [
       {
@@ -27,10 +31,6 @@ export const router = createBrowserRouter([
           {
             path: "/",
             element: <HomeRedirect />,
-          },
-          {
-            path: "/register",
-            element: <RegisterPage />,
           },
           {
             path: "/dashboard",
