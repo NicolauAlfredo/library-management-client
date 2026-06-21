@@ -6,96 +6,73 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { getLoans, returnBook, updateOverdueLoans } from "../../api/loans.api";
+import { getMyLoans, returnBook } from "../../api/loans.api";
 import { getApiErrorMessage } from "../../utils/get-api-error-message";
-
-import type { Loan, LoanStatus } from "../../types/loan";
 
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
+import { ConfirmModal } from "../../components/ui/ConfirmModal";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ErrorMessage } from "../../components/ui/ErrorMessage";
 import { Input } from "../../components/ui/Input";
 import { Loading } from "../../components/ui/Loading";
 import { Select } from "../../components/ui/Select";
-import { ConfirmModal } from "../../components/ui/ConfirmModal";
 
-export function LoansPage() {
+import type { Loan, LoanStatus } from "../../types/loan";
+
+export function MyLoansPage() {
   const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
-  const [status, setStatus] = useState<LoanStatus | "">("");
   const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<LoanStatus | "">("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loanToReturn, setLoanToReturn] = useState<Loan | null>(null);
 
   const { data, isLoading, isError, isFetching } = useQuery({
-    queryKey: ["loans", page, status, search],
+    queryKey: ["my-loans", page, search, status],
     queryFn: () =>
-      getLoans({
+      getMyLoans({
         page,
         limit: 10,
-        status: status || undefined,
         search: search || undefined,
+        status: status || undefined,
       }),
     placeholderData: keepPreviousData,
   });
 
   const returnLoanMutation = useMutation({
     mutationFn: returnBook,
+
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["loans"] });
+      queryClient.invalidateQueries({ queryKey: ["my-loans"] });
       queryClient.invalidateQueries({ queryKey: ["books"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+
       setErrorMessage("");
     },
+
     onError: (error) => {
       setErrorMessage(getApiErrorMessage(error, "Failed to return book"));
     },
   });
 
-  const updateOverdueMutation = useMutation({
-    mutationFn: updateOverdueLoans,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["loans"] });
-      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
-      setErrorMessage("");
-    },
-    onError: (error) => {
-      setErrorMessage(
-        getApiErrorMessage(error, "Failed to update overdue loans"),
-      );
-    },
-  });
-
   if (isLoading && !data) {
-    return <Loading message="Loading loans..." />;
+    return <Loading message="Loading your loans..." />;
   }
 
   if (isError) {
-    return <ErrorMessage message="Failed to load loans." />;
+    return <ErrorMessage message="Failed to load your loans." />;
   }
 
   return (
     <section className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Loans</h1>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">My Loans</h1>
 
-          <p className="text-sm text-gray-500">
-            Track active, returned and late book loans.
-          </p>
-        </div>
-
-        <Button
-          type="button"
-          onClick={() => updateOverdueMutation.mutate()}
-          disabled={updateOverdueMutation.isPending}
-        >
-          {updateOverdueMutation.isPending
-            ? "Updating..."
-            : "Update overdue loans"}
-        </Button>
+        <p className="text-sm text-gray-500">
+          View and manage your borrowed books.
+        </p>
       </div>
 
       {errorMessage && <ErrorMessage message={errorMessage} />}
@@ -103,7 +80,7 @@ export function LoansPage() {
       <Card>
         <div className="grid gap-4 md:grid-cols-2">
           <Input
-            placeholder="Search by user, email or book"
+            placeholder="Search by book title"
             value={search}
             onChange={(event) => {
               setSearch(event.target.value);
@@ -131,7 +108,7 @@ export function LoansPage() {
       )}
 
       {!data?.data.length ? (
-        <EmptyState message="No loans found." />
+        <EmptyState message="You have no loans." />
       ) : (
         <div className="space-y-4">
           {data.data.map((loan) => (
@@ -139,19 +116,19 @@ export function LoansPage() {
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">
-                    {loan.bookTitle ?? `Book #${loan.bookId}`}
+                    {loan.bookTitle}
                   </h2>
 
-                  <p className="text-sm text-gray-500">
-                    User: {loan.userName ?? `User #${loan.userId}`}
-                  </p>
+                  {loan.bookAuthor && (
+                    <p className="text-sm text-gray-500">{loan.bookAuthor}</p>
+                  )}
 
                   <p className="text-sm text-gray-500">
                     Due date: {new Date(loan.dueDate).toLocaleDateString()}
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2">
                   <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
                     {loan.status}
                   </span>
@@ -162,7 +139,7 @@ export function LoansPage() {
                       variant="secondary"
                       onClick={() => setLoanToReturn(loan)}
                     >
-                      Return book
+                      Return Book
                     </Button>
                   )}
                 </div>
@@ -178,7 +155,7 @@ export function LoansPage() {
             type="button"
             variant="secondary"
             disabled={page === 1}
-            onClick={() => setPage((currentPage) => currentPage - 1)}
+            onClick={() => setPage((current) => current - 1)}
           >
             Previous
           </Button>
@@ -194,7 +171,7 @@ export function LoansPage() {
               !data?.pagination.totalPages ||
               page === data.pagination.totalPages
             }
-            onClick={() => setPage((currentPage) => currentPage + 1)}
+            onClick={() => setPage((current) => current + 1)}
           >
             Next
           </Button>
@@ -204,9 +181,7 @@ export function LoansPage() {
       <ConfirmModal
         isOpen={!!loanToReturn}
         title="Return book"
-        message={`Are you sure you want to return "${
-          loanToReturn?.bookTitle ?? `Book #${loanToReturn?.bookId}`
-        }"?`}
+        message={`Are you sure you want to return "${loanToReturn?.bookTitle}"?`}
         confirmLabel="Return"
         isLoading={returnLoanMutation.isPending}
         onCancel={() => setLoanToReturn(null)}

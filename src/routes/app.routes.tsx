@@ -10,6 +10,7 @@ import { LoansPage } from "../pages/loans/LoansPage";
 import { AppLayout } from "../components/layout/AppLayout";
 import { HomeRedirect } from "./HomeRedirect";
 import { AdminRoute } from "../components/protected-route/AdminRoute";
+import { MyLoansPage } from "../pages/my-loans/MyLoansPage";
 
 export const router = createBrowserRouter([
   {
@@ -44,7 +45,15 @@ export const router = createBrowserRouter([
           },
           {
             path: "/loans",
-            element: <LoansPage />,
+            element: (
+              <AdminRoute>
+                <LoansPage />
+              </AdminRoute>
+            ),
+          },
+          {
+            path: "/my-loans",
+            element: <MyLoansPage />,
           },
         ],
       },

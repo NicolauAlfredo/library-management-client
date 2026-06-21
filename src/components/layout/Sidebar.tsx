@@ -7,10 +7,12 @@ export function Sidebar() {
   const isAdmin = user?.role === "ADMIN";
 
   const links = [
-    ...(isAdmin ? [{ to: "/", label: "Dashboard" }] : []),
+    ...(isAdmin ? [{ to: "/dashboard", label: "Dashboard" }] : []),
     { to: "/books", label: "Books" },
     ...(isAdmin ? [{ to: "/users", label: "Users" }] : []),
-    { to: "/loans", label: isAdmin ? "Loans" : "My Loans" },
+    ...(isAdmin
+      ? [{ to: "/loans", label: "Loans" }]
+      : [{ to: "/my-loans", label: "My Loans" }]),
   ];
 
   return (

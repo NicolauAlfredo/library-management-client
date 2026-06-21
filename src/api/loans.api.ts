@@ -15,7 +15,7 @@ export async function getLoans(filters: LoanFilters = {}) {
   return response.data;
 }
 
-export async function getMyLoans(filters: { page?: number; limit?: number }) {
+export async function getMyLoans(filters: LoanFilters = {}) {
   const response = await api.get<PaginatedResponse<Loan>>("/loans/my", {
     params: filters,
   });
