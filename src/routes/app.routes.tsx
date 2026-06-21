@@ -14,6 +14,8 @@ import { MyLoansPage } from "../pages/my-loans/MyLoansPage";
 import { RegisterPage } from "../pages/register/RegisterPage";
 import { BookDetailsPage } from "../pages/books/BookDetailsPage";
 import { ProfilePage } from "../pages/profile/ProfilePage";
+import { ForgotPasswordPage } from "../pages/forgot-password/ForgotPasswordPage";
+import { ResetPasswordPage } from "../pages/reset-password/ResetPasswordPage";
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +25,14 @@ export const router = createBrowserRouter([
   {
     path: "/register",
     element: <RegisterPage />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPasswordPage />,
   },
   {
     element: <ProtectedRoute />,

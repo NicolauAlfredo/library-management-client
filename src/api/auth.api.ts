@@ -58,3 +58,33 @@ export async function getProfileRequest(): Promise<User> {
 
   return response.data.data;
 }
+
+export interface ForgotPasswordData {
+  email: string;
+}
+
+export interface ResetPasswordData {
+  token: string;
+  newPassword: string;
+}
+
+export interface ForgotPasswordResponse {
+  resetUrl: string | null;
+}
+
+export async function forgotPasswordRequest(
+  data: ForgotPasswordData,
+): Promise<ForgotPasswordResponse> {
+  const response = await api.post<ApiResponse<ForgotPasswordResponse>>(
+    "/auth/forgot-password",
+    data,
+  );
+
+  return response.data.data;
+}
+
+export async function resetPasswordRequest(
+  data: ResetPasswordData,
+): Promise<void> {
+  await api.post("/auth/reset-password", data);
+}
