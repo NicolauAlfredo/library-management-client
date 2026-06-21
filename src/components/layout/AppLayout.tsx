@@ -5,13 +5,13 @@ import { Header } from "./Header";
 
 export function AppLayout() {
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Sidebar />
 
-      <div>
+      <div className="lg:pl-64">
         <Header />
 
-        <main>
+        <main className="p-4 sm:p-6 lg:p-8">
           <Outlet />
         </main>
       </div>
