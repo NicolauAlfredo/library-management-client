@@ -4,6 +4,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getApiErrorMessage } from "../../utils/get-api-error-message";
 import { borrowBook } from "../../api/loans.api";
 
+import { Button } from "../../components/ui/Button";
+import { Card } from "../../components/ui/Card";
+import { EmptyState } from "../../components/ui/EmptyState";
+import { ErrorMessage } from "../../components/ui/ErrorMessage";
+import { Input } from "../../components/ui/Input";
+import { Loading } from "../../components/ui/Loading";
+import { Select } from "../../components/ui/Select";
+
 import {
   createBook,
   deleteBook,
@@ -117,152 +125,194 @@ export function BooksPage() {
   });
 
   if (isLoading) {
-    return <p>Loading books...</p>;
+    return <Loading message="Loading books..." />;
   }
 
   if (isError) {
-    return <p>Failed to load books.</p>;
+    return <ErrorMessage message="Failed to load books." />;
   }
 
   return (
-    <section>
-      <button
-        type="button"
-        onClick={() => {
-          setSelectedBook(null);
-          setIsFormOpen((current) => !current);
-        }}
-      >
-        {isFormOpen ? "Close Form" : "Add Book"}
-      </button>
+    <section className="space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Books</h1>
+          <p className="text-sm text-gray-500">
+            Manage books, availability and library catalog.
+          </p>
+        </div>
 
-      {errorMessage && <p>{errorMessage}</p>}
+        <Button
+          type="button"
+          onClick={() => {
+            setSelectedBook(null);
+            setIsFormOpen((current) => !current);
+            setErrorMessage("");
+          }}
+        >
+          {isFormOpen ? "Close Form" : "Add Book"}
+        </Button>
+      </div>
+
+      {errorMessage && <ErrorMessage message={errorMessage} />}
+
+      <Card>
+        <div className="grid gap-4 md:grid-cols-4">
+          <Input
+            placeholder="Search by title, author or ISBN"
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setPage(1);
+            }}
+          />
+          <Input
+            placeholder="Category"
+            value={category}
+            onChange={(event) => {
+              setCategory(event.target.value);
+              setPage(1);
+            }}
+          />
+          <Select
+            value={available}
+            onChange={(event) => {
+              setAvailable(event.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="">All availability</option>
+            <option value="true">Available</option>
+            <option value="false">Unavailabley</option>
+          </Select>
+
+          <Select
+            value={limit}
+            onChange={(event) => {
+              setLimit(Number(event.target.value));
+              setPage(1);
+            }}
+          >
+            <option value={5}>5 per page</option>
+            <option value={10}>10 per page</option>
+            <option value={20}>20 per page</option>
+          </Select>
+        </div>
+      </Card>
 
       {isFormOpen && (
-        <BookForm
-          defaultValues={selectedBook ?? undefined}
-          isSubmitting={
-            createBookMutation.isPending || updateBookMutation.isPending
-          }
-          onSubmit={handleSubmitBook}
-        />
+        <Card>
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">
+            {selectedBook ? "Update Book" : "Create Book"}
+          </h2>
+
+          <BookForm
+            defaultValues={selectedBook ?? undefined}
+            isSubmitting={
+              createBookMutation.isPending || updateBookMutation.isPending
+            }
+            onSubmit={handleSubmitBook}
+          />
+        </Card>
       )}
 
-      <h1>Books</h1>
+      {!data?.data.length ? (
+        <EmptyState message="No books found." />
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {data.data.map((book) => (
+            <Card key={book.id}>
+              <div className="flex gap-4">
+                {book.coverUrl && (
+                  <img
+                    src={book.coverUrl}
+                    alt={book.title}
+                    className="h-28 w-20 rounded-md object-cover"
+                  />
+                )}
 
-      <div>
-        <input
-          type="text"
-          placeholder="Search by title, author or ISBN"
-          value={search}
-          onChange={(event) => {
-            setSearch(event.target.value);
-            setPage(1);
-          }}
-        />
+                <div className="min-w-0 flex-1">
+                  <h2 className="truncate text-lg font-semibold text-gray-900">
+                    {book.title}
+                  </h2>
 
-        <input
-          type="text"
-          placeholder="Category"
-          value={category}
-          onChange={(event) => {
-            setCategory(event.target.value);
-            setPage(1);
-          }}
-        />
+                  <p className="text-sm text-gray-500">{book.author}</p>
 
-        <select
-          value={available}
-          onChange={(event) => {
-            setAvailable(event.target.value);
-            setPage(1);
-          }}
-        >
-          <option value="">All availability</option>
-          <option value="true">Available</option>
-          <option value="false">Unavailable</option>
-        </select>
+                  <p className="mt-2 text-sm text-gray-600">
+                    {book.category ?? "No category"}
+                  </p>
 
-        <select
-          value={limit}
-          onChange={(event) => {
-            setLimit(Number(event.target.value));
-            setPage(1);
-          }}
-        >
-          <option value={5}>5 per page</option>
-          <option value={10}>10 per page</option>
-          <option value={20}>20 per page</option>
-        </select>
-      </div>
+                  <p className="mt-2 text-sm font-medium text-gray-900">
+                    Available: {book.availableQuantity} / {book.quantity}
+                  </p>
+                </div>
+              </div>
 
-      <div>
-        {data?.data.map((book) => (
-          <article key={book.id}>
-            {book.coverUrl && (
-              <img src={book.coverUrl} alt={book.title} width={80} />
-            )}
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    setSelectedBook(book);
+                    setIsFormOpen(true);
+                    setErrorMessage("");
+                  }}
+                >
+                  Edit
+                </Button>
 
-            <h2>{book.title}</h2>
-            <p>{book.author}</p>
-            <p>{book.category}</p>
-            <p>
-              Available: {book.availableQuantity}/{book.quantity}
-            </p>
+                <Button
+                  type="button"
+                  variant="danger"
+                  onClick={() => deleteBookMutation.mutate(book.id)}
+                  disabled={deleteBookMutation.isPending}
+                >
+                  Delete
+                </Button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedBook(book);
-                setIsFormOpen(true);
-              }}
-            >
-              Edit
-            </button>
+                <Button
+                  type="button"
+                  disabled={
+                    book.availableQuantity === 0 || borrowBookMutation.isPending
+                  }
+                  onClick={() => borrowBookMutation.mutate(book.id)}
+                >
+                  {book.availableQuantity === 0 ? "Unavailable" : "Borrow"}
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
 
-            <button
-              type="button"
-              onClick={() => deleteBookMutation.mutate(book.id)}
-            >
-              Delete
-            </button>
+      <Card>
+        <div className="flex items-center justify-between">
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={page === 1}
+            onClick={() => setPage((currentPage) => currentPage - 1)}
+          >
+            Previous
+          </Button>
 
-            <button
-              type="button"
-              disabled={
-                book.availableQuantity === 0 || borrowBookMutation.isPending
-              }
-              onClick={() => borrowBookMutation.mutate(book.id)}
-            >
-              {book.availableQuantity === 0 ? "Unavailable" : "Borrow"}
-            </button>
-          </article>
-        ))}
-      </div>
+          <span className="text-sm text-gray-600">
+            Page {data?.pagination.page} of {data?.pagination.totalPages}
+          </span>
 
-      <div>
-        <button
-          type="button"
-          disabled={page === 1}
-          onClick={() => setPage((currentPage) => currentPage - 1)}
-        >
-          Previous
-        </button>
-
-        <span>
-          Page {data?.pagination.page} of {data?.pagination.totalPages}
-        </span>
-
-        <button
-          type="button"
-          disabled={
-            !data?.pagination.totalPages || page === data.pagination.totalPages
-          }
-          onClick={() => setPage((currentPage) => currentPage + 1)}
-        >
-          Next
-        </button>
-      </div>
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={
+              !data?.pagination.totalPages ||
+              page === data.pagination.totalPages
+            }
+            onClick={() => setPage((currentPage) => currentPage + 1)}
+          >
+            Next
+          </Button>
+        </div>
+      </Card>
     </section>
   );
 }

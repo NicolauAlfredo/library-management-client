@@ -1,6 +1,4 @@
+@import "tailwindcss";
+
 @import "./reset.css";
 @import "./variables.css";
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
