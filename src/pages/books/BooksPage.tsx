@@ -52,17 +52,45 @@ export function BooksPage() {
   const updateBookMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: BookFormData }) =>
       updateBook(id, data),
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] });
+      setErrorMessage("");
       setSelectedBook(null);
       setIsFormOpen(false);
+    },
+
+    onError: (error) => {
+      if (axios.isAxiosError<ApiErrorResponse>(error)) {
+        setErrorMessage(
+          error.response?.data.message ?? "Failed to update book",
+        );
+
+        return;
+      }
+
+      setErrorMessage("Unexpected error");
     },
   });
 
   const deleteBookMutation = useMutation({
     mutationFn: deleteBook,
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] });
+      setErrorMessage("");
+    },
+
+    onError: (error) => {
+      if (axios.isAxiosError<ApiErrorResponse>(error)) {
+        setErrorMessage(
+          error.response?.data.message ?? "Failed to delete book",
+        );
+
+        return;
+      }
+
+      setErrorMessage("Unexpected error");
     },
   });
 
