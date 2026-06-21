@@ -31,6 +31,8 @@ import type { BookFormData } from "./book.schema";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
 import { useAuth } from "../../contexts/auth.context";
 
+import toast from "react-hot-toast";
+
 export function BooksPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -49,12 +51,15 @@ export function BooksPage() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+
+      toast.success("Book created successfully");
+
       setErrorMessage("");
       setIsFormOpen(false);
     },
-
     onError: (error) => {
-      setErrorMessage(getApiErrorMessage(error, "Failed to create book"));
+      toast.error(getApiErrorMessage(error, "Failed to create book"));
     },
   });
 
@@ -64,13 +69,15 @@ export function BooksPage() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] });
+
+      toast.success("Book updated successfully");
+
       setErrorMessage("");
       setSelectedBook(null);
       setIsFormOpen(false);
     },
-
     onError: (error) => {
-      setErrorMessage(getApiErrorMessage(error, "Failed to update book"));
+      toast.error(getApiErrorMessage(error, "Failed to update book"));
     },
   });
 
@@ -79,11 +86,14 @@ export function BooksPage() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+
+      toast.success("Book deleted successfully");
+
       setErrorMessage("");
     },
-
     onError: (error) => {
-      setErrorMessage(getApiErrorMessage(error, "Failed to delete book"));
+      toast.error(getApiErrorMessage(error, "Failed to delete book"));
     },
   });
 

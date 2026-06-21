@@ -65,7 +65,7 @@ export function RegisterPage() {
           <Input
             label="Name"
             type="text"
-            placeholder="John Doe"
+            placeholder="Nicolau Alfredo"
             autoComplete="name"
             error={errors.name?.message}
             {...register("name")}
@@ -74,7 +74,7 @@ export function RegisterPage() {
           <Input
             label="Email"
             type="email"
-            placeholder="john@example.com"
+            placeholder="info@nicolaualfredo.com"
             autoComplete="email"
             error={errors.email?.message}
             {...register("email")}

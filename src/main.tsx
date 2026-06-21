@@ -6,6 +6,8 @@ import App from "./App.tsx";
 import "./styles/global.css";
 import { AuthProvider } from "./contexts/auth.context.tsx";
 
+import { Toaster } from "react-hot-toast";
+
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
@@ -13,6 +15,7 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <App />
+        <Toaster position="top-right" />
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,
