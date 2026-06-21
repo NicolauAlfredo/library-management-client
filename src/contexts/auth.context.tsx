@@ -15,6 +15,7 @@ interface AuthContextData {
   isLoading: boolean;
   login: (data: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
+  updateAuthenticatedUser: (user: User) => void;
   logout: () => void;
 }
 
@@ -44,6 +45,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("@library:token");
 
     setUser(null);
+  }
+
+  function updateAuthenticatedUser(user: User) {
+    setUser(user);
   }
 
   useEffect(() => {
@@ -78,6 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         register,
         logout,
+        updateAuthenticatedUser,
       }}
     >
       {children}

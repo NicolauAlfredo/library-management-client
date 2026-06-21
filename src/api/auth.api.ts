@@ -32,6 +32,15 @@ export async function registerRequest(
   return response.data.data;
 }
 
+export async function updateProfileRequest(data: {
+  name?: string;
+  email?: string;
+}): Promise<User> {
+  const response = await api.patch<ApiResponse<User>>("/auth/profile", data);
+
+  return response.data.data;
+}
+
 export async function getProfileRequest(): Promise<User> {
   const response = await api.get<ApiResponse<User>>("/auth/profile");
 
