@@ -28,7 +28,15 @@ export function Sidebar({ mobile = false, onNavigate }: SidebarProps) {
           : "fixed inset-y-0 left-0 hidden w-64 border-r border-gray-200 bg-white px-4 py-6 lg:block"
       }
     >
-      <h1 className="mb-8 text-xl font-bold text-gray-900">Library Admin</h1>
+      <h1 className="mb-8 text-xl font-bold text-gray-900">
+        <div className="mb-8 flex justify-center">
+          <img
+            src="/assets/logo/librara-text.png"
+            alt="Librara"
+            className="h-30 w-auto"
+          />
+        </div>
+      </h1>
 
       <nav className="space-y-1">
         {links.map((link) => (
