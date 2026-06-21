@@ -4,6 +4,7 @@ import { getAdminDashboardStats } from "../../api/dashboard.api";
 import { Card } from "../../components/ui/Card";
 import { Loading } from "../../components/ui/Loading";
 import { ErrorMessage } from "../../components/ui/ErrorMessage";
+import { getBooks } from "../../api/books.api";
 
 import {
   Bar,
@@ -23,6 +24,31 @@ export function DashboardPage() {
     queryKey: ["dashboard-stats"],
     queryFn: getAdminDashboardStats,
   });
+
+  const { data: booksResponse } = useQuery({
+    queryKey: ["dashboard-books-category"],
+    queryFn: () =>
+      getBooks({
+        page: 1,
+        limit: 100,
+      }),
+  });
+
+  const booksByCategoryData =
+    booksResponse?.data.reduce<Record<string, number>>((acc, book) => {
+      const category = book.category ?? "Uncategorized";
+
+      acc[category] = (acc[category] ?? 0) + 1;
+
+      return acc;
+    }, {}) ?? {};
+
+  const categoryChartData = Object.entries(booksByCategoryData).map(
+    ([name, value]) => ({
+      name,
+      value,
+    }),
+  );
 
   const loanStatusData = [
     { name: "Active", value: data?.activeLoans ?? 0 },
@@ -170,6 +196,24 @@ export function DashboardPage() {
                     />
                   ))}
                 </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">
+            Books by Category
+          </h2>
+
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={categoryChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis allowDecimals={false} />
+                <Tooltip contentStyle={chartTooltipStyle} />
+                <Bar dataKey="value" radius={[8, 8, 0, 0]} fill="#2563EB" />
               </BarChart>
             </ResponsiveContainer>
           </div>
