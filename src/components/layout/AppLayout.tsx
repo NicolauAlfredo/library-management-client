@@ -1,20 +1,28 @@
 import { Outlet } from "react-router-dom";
-
+import { MobileSidebar } from "./MobileSidebar";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
+import { useState } from "react";
 
 export function AppLayout() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
       <Sidebar />
 
-      <div className="lg:pl-64">
-        <Header />
+      <MobileSidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
 
-        <main className="p-4 sm:p-6 lg:p-8">
+      <div className="lg:ml-64">
+        <Header onMenuClick={() => setIsSidebarOpen(true)} />
+
+        <main>
           <Outlet />
         </main>
       </div>
-    </div>
+    </>
   );
 }
