@@ -15,19 +15,12 @@ export async function getLoans(filters: LoanFilters = {}) {
   return response.data;
 }
 
-export async function getMyLoans(): Promise<PaginatedResponse<Loan>> {
-  const response = await api.get<ApiResponse<Loan[]>>("/loans/my");
+export async function getMyLoans(filters: { page?: number; limit?: number }) {
+  const response = await api.get<PaginatedResponse<Loan>>("/loans/my", {
+    params: filters,
+  });
 
-  return {
-    success: response.data.success,
-    data: response.data.data,
-    pagination: {
-      page: 1,
-      limit: response.data.data.length,
-      total: response.data.data.length,
-      totalPages: 1,
-    },
-  };
+  return response.data;
 }
 
 export async function borrowBook(bookId: number): Promise<Loan> {

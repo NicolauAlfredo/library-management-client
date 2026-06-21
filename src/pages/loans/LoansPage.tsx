@@ -48,7 +48,10 @@ export function LoansPage() {
             status: status || undefined,
             search: search || undefined,
           })
-        : getMyLoans(),
+        : getMyLoans({
+            page,
+            limit: 10,
+          }),
     placeholderData: keepPreviousData,
   });
 
@@ -91,9 +94,14 @@ export function LoansPage() {
     <section className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Loans</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {isAdmin ? "Loans" : "My Loans"}
+          </h1>
+
           <p className="text-sm text-gray-500">
-            Track active, returned and late book loans.
+            {isAdmin
+              ? "Track active, returned and late book loans."
+              : "View and manage your borrowed books."}
           </p>
         </div>
 
@@ -157,7 +165,11 @@ export function LoansPage() {
                   </h2>
 
                   <p className="text-sm text-gray-500">
-                    User: {loan.userName ?? `User #${loan.userId}`}
+                    {isAdmin && (
+                      <p className="text-sm text-gray-500">
+                        User: {loan.userName ?? `User #${loan.userId}`}
+                      </p>
+                    )}
                   </p>
 
                   <p className="text-sm text-gray-500">
