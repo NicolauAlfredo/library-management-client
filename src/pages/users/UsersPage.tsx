@@ -1,8 +1,16 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { deleteUser, getUsers, updateUser } from "../../api/users.api";
 import { getApiErrorMessage } from "../../utils/get-api-error-message";
+
+import { Button } from "../../components/ui/Button";
+import { Card } from "../../components/ui/Card";
+import { EmptyState } from "../../components/ui/EmptyState";
+import { ErrorMessage } from "../../components/ui/ErrorMessage";
+import { Input } from "../../components/ui/Input";
+import { Loading } from "../../components/ui/Loading";
+import { Select } from "../../components/ui/Select";
 
 import type { Role, User } from "../../types/user";
 
@@ -60,92 +68,119 @@ export function UsersPage() {
   }
 
   if (isLoading) {
-    return <p>Loading users...</p>;
+    return <Loading message="Loading users..." />;
   }
 
   if (isError) {
-    return <p>Failed to load users.</p>;
+    return <Loading message="Failed to load users." />;
   }
 
   return (
-    <section>
-      <h1>Users</h1>
-
-      {errorMessage && <p>{errorMessage}</p>}
-
+    <section className="space-y-6">
       <div>
-        <input
-          type="text"
-          placeholder="Search by name or email"
-          value={search}
-          onChange={(event) => {
-            setSearch(event.target.value);
-            setPage(1);
-          }}
-        />
-
-        <select
-          value={role}
-          onChange={(event) => {
-            setRole(event.target.value as Role | "");
-            setPage(1);
-          }}
-        >
-          <option value="">All roles</option>
-          <option value="ADMIN">Admin</option>
-          <option value="USER">User</option>
-        </select>
+        <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+        <p className="text-sm text-gray-500">
+          Manage registered users and their roles.
+        </p>
       </div>
 
-      <div>
-        {data?.data.map((user) => (
-          <article key={user.id}>
-            <h2>{user.name}</h2>
-            <p>{user.email}</p>
-            <p>Role: {user.role}</p>
+      {errorMessage && <ErrorMessage message={errorMessage} />}
 
-            <button
-              type="button"
-              onClick={() => handleToggleRole(user)}
-              disabled={updateUserMutation.isPending}
-            >
-              Change to {user.role === "ADMIN" ? "USER" : "ADMIN"}
-            </button>
+      <Card>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Input
+            placeholder="Search by name or email"
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setPage(1);
+            }}
+          />
 
-            <button
-              type="button"
-              onClick={() => deleteUserMutation.mutate(user.id)}
-              disabled={deleteUserMutation.isPending}
-            >
-              Delete
-            </button>
-          </article>
-        ))}
-      </div>
+          <Select
+            value={role}
+            onChange={(event) => {
+              setRole(event.target.value as Role | "");
+              setPage(1);
+            }}
+          >
+            <option value="">All roles</option>
+            <option value="ADMIN">Admin</option>
+            <option value="USER">User</option>
+          </Select>
+        </div>
+      </Card>
 
-      <div>
-        <button
-          type="button"
-          disabled={page === 1}
-          onClick={() => setPage((currentPage) => currentPage - 1)}
-        >
-          Previous
-        </button>
+      {!data?.data.length ? (
+        <EmptyState message="No users found." />
+      ) : (
+        <div className="space-y-4">
+          {data.data.map((user) => (
+            <Card key={user.id}>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="text-lg font-semibold text-gray-900">
+                  <h2>{user.name}</h2>
 
-        <span>
-          Page {data?.pagination.page} of {data?.pagination.totalPages}
-        </span>
+                  <p className="text-sm text-gray-500">{user.email}</p>
 
-        <button
-          type="button"
-          disabled={
-            !data?.pagination.totalPages || page === data.pagination.totalPages
-          }
-          onClick={() => setPage((currentPage) => currentPage + 1)}
-        >
-          Next
-        </button>
-      </div>
+                  <span className="mt-2 inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                    {user.role}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => handleToggleRole(user)}
+                    disabled={updateUserMutation.isPending}
+                  >
+                    Change to {user.role === "ADMIN" ? "USER" : "ADMIN"}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="danger"
+                    onClick={() => deleteUserMutation.mutate(user.id)}
+                    disabled={deleteUserMutation.isPending}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <Card>
+        <div className="flex items-center justify-between">
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={page === 1}
+            onClick={() => setPage((currentPage) => currentPage - 1)}
+          >
+            Previous
+          </Button>
+
+          <span className="text-sm text-gray-600">
+            Page {data?.pagination.page} of {data?.pagination.totalPages}
+          </span>
+
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={
+              !data?.pagination.totalPages ||
+              page === data.pagination.totalPages
+            }
+            onClick={() => setPage((currentPage) => currentPage + 1)}
+          >
+            Next
+          </Button>
+        </div>
+      </Card>
     </section>
   );
 }
