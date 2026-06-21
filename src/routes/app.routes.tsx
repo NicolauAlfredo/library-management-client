@@ -12,6 +12,7 @@ import { HomeRedirect } from "./HomeRedirect";
 import { AdminRoute } from "../components/protected-route/AdminRoute";
 import { MyLoansPage } from "../pages/my-loans/MyLoansPage";
 import { RegisterPage } from "../pages/register/RegisterPage";
+import { BookDetailsPage } from "../pages/books/BookDetailsPage";
 
 export const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ export const router = createBrowserRouter([
           {
             path: "/books",
             element: <BooksPage />,
+          },
+          {
+            path: "/books/:id",
+            element: <BookDetailsPage />,
           },
           {
             path: "/users",

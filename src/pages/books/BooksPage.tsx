@@ -32,6 +32,7 @@ import { ConfirmModal } from "../../components/ui/ConfirmModal";
 import { useAuth } from "../../contexts/auth.context";
 
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 export function BooksPage() {
   const [page, setPage] = useState(1);
@@ -104,11 +105,14 @@ export function BooksPage() {
       queryClient.invalidateQueries({ queryKey: ["books"] });
       queryClient.invalidateQueries({ queryKey: ["loans"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+
+      toast.success("Book borrowed successfully.");
+
       setErrorMessage("");
     },
 
     onError: (error) => {
-      setErrorMessage(getApiErrorMessage(error, "Failed to borrow book"));
+      toast.error(getApiErrorMessage(error, "Failed to borrow book"));
     },
   });
 
@@ -314,6 +318,12 @@ export function BooksPage() {
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
+                <Link to={`/books/${book.id}`}>
+                  <Button type="button" variant="secondary">
+                    Details
+                  </Button>
+                </Link>
+
                 {isAdmin && (
                   <>
                     <Button
@@ -337,18 +347,16 @@ export function BooksPage() {
                     </Button>
                   </>
                 )}
-                {user?.role === "USER" && (
-                  <Button
-                    type="button"
-                    disabled={
-                      book.availableQuantity === 0 ||
-                      borrowBookMutation.isPending
-                    }
-                    onClick={() => borrowBookMutation.mutate(book.id)}
-                  >
-                    {book.availableQuantity === 0 ? "Unavailable" : "Borrow"}
-                  </Button>
-                )}
+                {user?.role ? user?.role === "ADMIN" : "USER"}
+                <Button
+                  type="button"
+                  disabled={
+                    book.availableQuantity === 0 || borrowBookMutation.isPending
+                  }
+                  onClick={() => borrowBookMutation.mutate(book.id)}
+                >
+                  {book.availableQuantity === 0 ? "Unavailable" : "Borrow"}
+                </Button>
               </div>
             </Card>
           ))}

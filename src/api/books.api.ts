@@ -43,3 +43,9 @@ export async function updateBook(
 export async function deleteBook(id: number): Promise<void> {
   await api.delete(`/books/${id}`);
 }
+
+export async function getBookById(id: number): Promise<Book> {
+  const response = await api.get<ApiResponse<Book>>(`/books/${id}`);
+
+  return response.data.data;
+}
