@@ -49,6 +49,18 @@ export function DashboardPage() {
     return <ErrorMessage message="Failed to load dashboard." />;
   }
 
+  const loanStatusColors = {
+    Active: "#2563EB",
+    Returned: "#22C55E",
+    Late: "#EF4444",
+  };
+
+  const chartTooltipStyle = {
+    backgroundColor: "#FFFFFF",
+    border: "1px solid #E5E7EB",
+    borderRadius: "12px",
+  };
+
   return (
     <section className="space-y-6">
       <div>
@@ -103,9 +115,9 @@ export function DashboardPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
+        <Card className="border border-gray-100 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-gray-900">
-            Loan Status
+            Loan Distribution
           </h2>
 
           <div className="h-72">
@@ -119,19 +131,26 @@ export function DashboardPage() {
                   label
                 >
                   {loanStatusData.map((entry) => (
-                    <Cell key={entry.name} />
+                    <Cell
+                      key={entry.name}
+                      fill={
+                        loanStatusColors[
+                          entry.name as keyof typeof loanStatusColors
+                        ]
+                      }
+                    />
                   ))}
                 </Pie>
 
-                <Tooltip />
+                <Tooltip contentStyle={chartTooltipStyle} />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </Card>
 
-        <Card>
+        <Card className="border border-gray-100 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-gray-900">
-            Books Availability
+            Library Inventory
           </h2>
 
           <div className="h-72">
@@ -140,8 +159,17 @@ export function DashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="value" />
+
+                <Tooltip contentStyle={chartTooltipStyle} />
+
+                <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                  {booksData.map((entry) => (
+                    <Cell
+                      key={entry.name}
+                      fill={entry.name === "Available" ? "#2563EB" : "#0F172A"}
+                    />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
