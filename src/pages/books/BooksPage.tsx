@@ -155,6 +155,17 @@ export function BooksPage() {
 
   const isAdmin = user?.role === "ADMIN";
 
+  const totalBooksOnPage = data?.data.length ?? 0;
+
+  const availableCopiesOnPage =
+    data?.data.reduce((total, book) => total + book.availableQuantity, 0) ?? 0;
+
+  const borrowedCopiesOnPage =
+    data?.data.reduce(
+      (total, book) => total + (book.quantity - book.availableQuantity),
+      0,
+    ) ?? 0;
+
   return (
     <section className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -165,6 +176,29 @@ export function BooksPage() {
               ? "Manage books, availability and library catalog."
               : "Library catalog."}
           </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Card>
+            <p className="text-sm text-gray-500">Books on page</p>
+            <strong className="text-2xl font-bold text-gray-900">
+              {totalBooksOnPage}
+            </strong>
+          </Card>
+
+          <Card>
+            <p className="text-sm text-gray-500">Available copies</p>
+            <strong className="text-2xl font-bold text-green-600">
+              {availableCopiesOnPage}
+            </strong>
+          </Card>
+
+          <Card>
+            <p className="text-sm text-gray-500">Borrowed copies</p>
+            <strong className="text-2xl font-bold text-blue-600">
+              {borrowedCopiesOnPage}
+            </strong>
+          </Card>
         </div>
 
         {isAdmin && (
