@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { getApiErrorMessage } from "../../utils/get-api-error-message";
+import { borrowBook } from "../../api/loans.api";
 
 import {
   createBook,
@@ -67,6 +68,21 @@ export function BooksPage() {
 
     onError: (error) => {
       setErrorMessage(getApiErrorMessage(error, "Failed to delete book"));
+    },
+  });
+
+  const borrowBookMutation = useMutation({
+    mutationFn: borrowBook,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["books"] });
+      queryClient.invalidateQueries({ queryKey: ["loans"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+      setErrorMessage("");
+    },
+
+    onError: (error) => {
+      setErrorMessage(getApiErrorMessage(error, "Failed to borrow book"));
     },
   });
 
@@ -209,6 +225,16 @@ export function BooksPage() {
               onClick={() => deleteBookMutation.mutate(book.id)}
             >
               Delete
+            </button>
+
+            <button
+              type="button"
+              disabled={
+                book.availableQuantity === 0 || borrowBookMutation.isPending
+              }
+              onClick={() => borrowBookMutation.mutate(book.id)}
+            >
+              {book.availableQuantity === 0 ? "Unavailable" : "Borrow"}
             </button>
           </article>
         ))}
