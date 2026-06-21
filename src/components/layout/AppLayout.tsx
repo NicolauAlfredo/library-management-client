@@ -19,8 +19,11 @@ export function AppLayout() {
       <div className="lg:ml-64">
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
 
-        <main>
-          <Outlet />
+        <main className="p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto max-w-7xl">
+            {" "}
+            <Outlet />
+          </div>
         </main>
       </div>
     </>
