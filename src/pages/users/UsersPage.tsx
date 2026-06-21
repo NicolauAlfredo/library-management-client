@@ -19,6 +19,7 @@ import { Select } from "../../components/ui/Select";
 
 import type { Role, User } from "../../types/user";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
+import toast from "react-hot-toast";
 
 export function UsersPage() {
   const queryClient = useQueryClient();
@@ -47,10 +48,13 @@ export function UsersPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+
+      toast.success("User updated successfully");
+
       setErrorMessage("");
     },
     onError: (error) => {
-      setErrorMessage(getApiErrorMessage(error, "Failed to update user"));
+      toast.error(getApiErrorMessage(error, "Failed to update user"));
     },
   });
 
@@ -59,10 +63,13 @@ export function UsersPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+
+      toast.success("User deleted successfully");
+
       setErrorMessage("");
     },
     onError: (error) => {
-      setErrorMessage(getApiErrorMessage(error, "Failed to delete user"));
+      toast.error(getApiErrorMessage(error, "Failed to delete user"));
     },
   });
 

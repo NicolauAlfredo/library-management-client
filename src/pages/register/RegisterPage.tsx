@@ -29,17 +29,11 @@ export function RegisterPage() {
   });
 
   async function onSubmit(data: RegisterFormData) {
-    console.log("FORM SUBMITTED", data);
-
     try {
       await registerUser(data);
 
-      console.log("REGISTER SUCCESS");
-
       navigate("/books");
     } catch (error) {
-      console.error("REGISTER ERROR", error);
-
       setErrorMessage(getApiErrorMessage(error, "Failed to create account"));
     }
   }

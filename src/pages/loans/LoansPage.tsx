@@ -19,6 +19,7 @@ import { Input } from "../../components/ui/Input";
 import { Loading } from "../../components/ui/Loading";
 import { Select } from "../../components/ui/Select";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
+import toast from "react-hot-toast";
 
 export function LoansPage() {
   const queryClient = useQueryClient();
@@ -47,10 +48,13 @@ export function LoansPage() {
       queryClient.invalidateQueries({ queryKey: ["loans"] });
       queryClient.invalidateQueries({ queryKey: ["books"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+
+      toast.success("Book returned successfully");
+
       setErrorMessage("");
     },
     onError: (error) => {
-      setErrorMessage(getApiErrorMessage(error, "Failed to return book"));
+      toast.error(getApiErrorMessage(error, "Failed to return book"));
     },
   });
 
@@ -59,11 +63,16 @@ export function LoansPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["loans"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+
+      toast.success("Overdue loans updated");
+
       setErrorMessage("");
     },
     onError: (error) => {
       setErrorMessage(
-        getApiErrorMessage(error, "Failed to update overdue loans"),
+        toast.error(
+          getApiErrorMessage(error, "Failed to update overdue loans"),
+        ),
       );
     },
   });

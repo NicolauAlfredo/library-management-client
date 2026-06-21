@@ -20,6 +20,8 @@ import { Select } from "../../components/ui/Select";
 
 import type { Loan, LoanStatus } from "../../types/loan";
 
+import toast from "react-hot-toast";
+
 export function MyLoansPage() {
   const queryClient = useQueryClient();
 
@@ -49,11 +51,13 @@ export function MyLoansPage() {
       queryClient.invalidateQueries({ queryKey: ["books"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
 
+      toast.success("Book returned successfully");
+
       setErrorMessage("");
     },
 
     onError: (error) => {
-      setErrorMessage(getApiErrorMessage(error, "Failed to return book"));
+      toast.error(getApiErrorMessage(error, "Failed to return book"));
     },
   });
 
