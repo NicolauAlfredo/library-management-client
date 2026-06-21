@@ -7,9 +7,20 @@ import { loginSchema } from "./login.schema";
 
 import type { LoginFormData } from "./login.schema";
 
+import { Button } from "../../components/ui/Button";
+import { Card } from "../../components/ui/Card";
+import { EmptyState } from "../../components/ui/EmptyState";
+import { ErrorMessage } from "../../components/ui/ErrorMessage";
+import { Input } from "../../components/ui/Input";
+import { Loading } from "../../components/ui/Loading";
+import { Select } from "../../components/ui/Select";
+import { useState } from "react";
+import { getApiErrorMessage } from "../../utils/get-api-error-message";
+
 export function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [errorMessage, setErrorMessage] = useState("");
 
   const {
     register,
@@ -20,31 +31,53 @@ export function LoginPage() {
   });
 
   async function onSubmit(data: LoginFormData) {
-    await login(data);
-    navigate("/");
+    try {
+      await login(data);
+      setErrorMessage("");
+      navigate("/");
+    } catch (error) {
+      setErrorMessage(getApiErrorMessage(error, "Invalid email or password"));
+    }
   }
 
   return (
-    <main>
-      <h1>Login</h1>
-
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input type="email" id="email" {...register("email")} />
-          {errors.email && <p>{errors.email.message}</p>}
+    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+      <Card className="w-full max-w-md">
+        <div className=" mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Login</h1>
+          <p className="text-sm text-gray-500">
+            Sign in to access the library dashboard.
+          </p>
         </div>
 
-        <div>
-          <label htmlFor="password">Password</label>
-          <input type="password" id="password" {...register("password")} />
-          {errors.password && <p>{errors.password.message}</p>}
-        </div>
+        {errorMessage && (
+          <div className="mb-4">
+            <ErrorMessage message={errorMessage} />
+          </div>
+        )}
 
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Logging in..." : "Login"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <Input
+            label="Email"
+            type="email"
+            placeholder="admin@library.com"
+            error={errors.email?.message}
+            {...register("email")}
+          />
+
+          <Input
+            label="Password"
+            type="password"
+            placeholder="Your password"
+            error={errors.password?.message}
+            {...register("password")}
+          />
+
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Loggin in..." : "Login"}
+          </Button>
+        </form>
+      </Card>
     </main>
   );
 }
