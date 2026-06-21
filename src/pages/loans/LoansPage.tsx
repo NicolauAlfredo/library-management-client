@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { getLoans, returnBook, updateOverdueLoans } from "../../api/loans.api";
 import { getApiErrorMessage } from "../../utils/get-api-error-message";
@@ -24,7 +29,7 @@ export function LoansPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loanToReturn, setLoanToReturn] = useState<Loan | null>(null);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ["loans", page, status, search],
     queryFn: () =>
       getLoans({
@@ -33,6 +38,7 @@ export function LoansPage() {
         status: status || undefined,
         search: search || undefined,
       }),
+    placeholderData: keepPreviousData,
   });
 
   const returnLoanMutation = useMutation({
@@ -62,7 +68,7 @@ export function LoansPage() {
     },
   });
 
-  if (isLoading) {
+  if (isLoading && !data) {
     return <Loading message="Loading loans..." />;
   }
 
@@ -118,6 +124,10 @@ export function LoansPage() {
           </Select>
         </div>
       </Card>
+
+      {isFetching && (
+        <p className="text-sm text-gray-500">Updating results...</p>
+      )}
 
       {!data?.data.length ? (
         <EmptyState message="No loans found." />

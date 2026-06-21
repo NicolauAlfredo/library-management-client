@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { getApiErrorMessage } from "../../utils/get-api-error-message";
 import { borrowBook } from "../../api/loans.api";
@@ -109,7 +114,7 @@ export function BooksPage() {
     createBookMutation.mutate(data);
   }
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ["books", page, search, category, available, limit],
     queryFn: () =>
       getBooks({
@@ -124,9 +129,10 @@ export function BooksPage() {
               ? false
               : undefined,
       }),
+    placeholderData: keepPreviousData,
   });
 
-  if (isLoading) {
+  if (isLoading && !data) {
     return <Loading message="Loading books..." />;
   }
 
@@ -216,6 +222,10 @@ export function BooksPage() {
             onSubmit={handleSubmitBook}
           />
         </Card>
+      )}
+
+      {isFetching && (
+        <p className="text-sm text-gray-500">Updating results...</p>
       )}
 
       {!data?.data.length ? (

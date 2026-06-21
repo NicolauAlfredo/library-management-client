@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { deleteUser, getUsers, updateUser } from "../../api/users.api";
 import { getApiErrorMessage } from "../../utils/get-api-error-message";
@@ -24,7 +29,7 @@ export function UsersPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ["users", page, search, role],
     queryFn: () =>
       getUsers({
@@ -33,6 +38,7 @@ export function UsersPage() {
         search: search || undefined,
         role: role || undefined,
       }),
+    placeholderData: keepPreviousData,
   });
 
   const updateUserMutation = useMutation({
@@ -69,7 +75,7 @@ export function UsersPage() {
     });
   }
 
-  if (isLoading) {
+  if (isLoading && !data) {
     return <Loading message="Loading users..." />;
   }
 
@@ -112,6 +118,10 @@ export function UsersPage() {
           </Select>
         </div>
       </Card>
+
+      {isFetching && (
+        <p className="text-sm text-gray-500">Updating results...</p>
+      )}
 
       {!data?.data.length ? (
         <EmptyState message="No users found." />
