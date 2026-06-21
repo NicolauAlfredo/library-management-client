@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import type { ApiErrorResponse } from "../../types/api";
+
+import { getApiErrorMessage } from "../../utils/get-api-error-message";
 
 import {
   createBook,
@@ -37,15 +37,7 @@ export function BooksPage() {
     },
 
     onError: (error) => {
-      if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        setErrorMessage(
-          error.response?.data.message ?? "Failed to create book",
-        );
-
-        return;
-      }
-
-      setErrorMessage("Unexpected error");
+      setErrorMessage(getApiErrorMessage(error, "Failed to create book"));
     },
   });
 
@@ -61,15 +53,7 @@ export function BooksPage() {
     },
 
     onError: (error) => {
-      if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        setErrorMessage(
-          error.response?.data.message ?? "Failed to update book",
-        );
-
-        return;
-      }
-
-      setErrorMessage("Unexpected error");
+      setErrorMessage(getApiErrorMessage(error, "Failed to update book"));
     },
   });
 
@@ -82,15 +66,7 @@ export function BooksPage() {
     },
 
     onError: (error) => {
-      if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        setErrorMessage(
-          error.response?.data.message ?? "Failed to delete book",
-        );
-
-        return;
-      }
-
-      setErrorMessage("Unexpected error");
+      setErrorMessage(getApiErrorMessage(error, "Failed to delete book"));
     },
   });
 
