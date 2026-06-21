@@ -11,6 +11,7 @@ import { AppLayout } from "../components/layout/AppLayout";
 import { HomeRedirect } from "./HomeRedirect";
 import { AdminRoute } from "../components/protected-route/AdminRoute";
 import { MyLoansPage } from "../pages/my-loans/MyLoansPage";
+import { RegisterPage } from "../pages/register/RegisterPage";
 
 export const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ export const router = createBrowserRouter([
           {
             path: "/",
             element: <HomeRedirect />,
+          },
+          {
+            path: "/register",
+            element: <RegisterPage />,
           },
           {
             path: "/dashboard",

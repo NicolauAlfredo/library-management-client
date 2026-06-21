@@ -1,49 +1,52 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../hooks/use-auth";
-import { loginSchema } from "./login.schema";
-
-import type { LoginFormData } from "./login.schema";
+import { getApiErrorMessage } from "../../utils/get-api-error-message";
 
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { ErrorMessage } from "../../components/ui/ErrorMessage";
 import { Input } from "../../components/ui/Input";
-import { useState } from "react";
-import { getApiErrorMessage } from "../../utils/get-api-error-message";
 
-export function LoginPage() {
+import { registerSchema } from "./register.schema";
+import type { RegisterFormData } from "./register.schema";
+
+export function RegisterPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register: registerUser } = useAuth();
+
   const [errorMessage, setErrorMessage] = useState("");
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
   });
 
-  async function onSubmit(data: LoginFormData) {
+  async function onSubmit(data: RegisterFormData) {
     try {
-      await login(data);
+      await registerUser(data);
+
       setErrorMessage("");
-      navigate("/");
+      navigate("/books");
     } catch (error) {
-      setErrorMessage(getApiErrorMessage(error, "Invalid email or password"));
+      setErrorMessage(getApiErrorMessage(error, "Failed to create account"));
     }
   }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
-        <div className=" mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Login</h1>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Create account</h1>
+
           <p className="text-sm text-gray-500">
-            Sign in to access the library dashboard.
+            Create your Librara account to borrow and manage books.
           </p>
         </div>
 
@@ -55,9 +58,17 @@ export function LoginPage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
+            label="Name"
+            type="text"
+            placeholder="John Doe"
+            error={errors.name?.message}
+            {...register("name")}
+          />
+
+          <Input
             label="Email"
             type="email"
-            placeholder="admin@library.com"
+            placeholder="john@example.com"
             error={errors.email?.message}
             {...register("email")}
           />
@@ -65,25 +76,25 @@ export function LoginPage() {
           <Input
             label="Password"
             type="password"
-            placeholder="Your password"
+            placeholder="Create a password"
             error={errors.password?.message}
             {...register("password")}
           />
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Loggin in..." : "Login"}
+            {isSubmitting ? "Creating account..." : "Create account"}
           </Button>
-
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Don't have an account?{" "}
-            <Link
-              to="/register"
-              className="font-medium text-blue-600 hover:text-blue-700"
-            >
-              Create account
-            </Link>
-          </p>
         </form>
+
+        <p className="mt-6 text-center text-sm text-gray-500">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="font-medium text-blue-600 hover:text-blue-700"
+          >
+            Sign in
+          </Link>
+        </p>
       </Card>
     </main>
   );
