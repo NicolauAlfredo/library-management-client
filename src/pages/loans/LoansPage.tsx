@@ -6,6 +6,14 @@ import { getApiErrorMessage } from "../../utils/get-api-error-message";
 
 import type { LoanStatus } from "../../types/loan";
 
+import { Button } from "../../components/ui/Button";
+import { Card } from "../../components/ui/Card";
+import { EmptyState } from "../../components/ui/EmptyState";
+import { ErrorMessage } from "../../components/ui/ErrorMessage";
+import { Input } from "../../components/ui/Input";
+import { Loading } from "../../components/ui/Loading";
+import { Select } from "../../components/ui/Select";
+
 export function LoansPage() {
   const queryClient = useQueryClient();
 
@@ -53,44 +61,24 @@ export function LoansPage() {
   });
 
   if (isLoading) {
-    return <p>Loading loans...</p>;
+    return <Loading message="Loading loans..." />;
   }
 
   if (isError) {
-    return <p>Failed to load loans.</p>;
+    return <Loading message="Failed to load loans." />;
   }
 
   return (
-    <section>
-      <h1>Loans</h1>
+    <section className="space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Loans</h1>
+          <p className="text-sm text-gray-500">
+            Track active, returned and late book loans.
+          </p>
+        </div>
 
-      {errorMessage && <p>{errorMessage}</p>}
-
-      <div>
-        <input
-          type="text"
-          placeholder="Search by user, email or book"
-          value={search}
-          onChange={(event) => {
-            setSearch(event.target.value);
-            setPage(1);
-          }}
-        />
-
-        <select
-          value={status}
-          onChange={(event) => {
-            setStatus(event.target.value as LoanStatus | "");
-            setPage(1);
-          }}
-        >
-          <option value="">All status</option>
-          <option value="ACTIVE">Active</option>
-          <option value="RETURNED">Returned</option>
-          <option value="LATE">Late</option>
-        </select>
-
-        <button
+        <Button
           type="button"
           onClick={() => updateOverdueMutation.mutate()}
           disabled={updateOverdueMutation.isPending}
@@ -98,61 +86,108 @@ export function LoansPage() {
           {updateOverdueMutation.isPending
             ? "Updating..."
             : "Update overdue loans"}
-        </button>
+        </Button>
       </div>
 
-      <div>
-        {data?.data.map((loan) => (
-          <article key={loan.id}>
-            <h2>{loan.bookTitle ?? `Book #${loan.bookId}`}</h2>
+      {errorMessage && <ErrorMessage message={errorMessage} />}
 
-            <p>User: {loan.userName ?? `User #${loan.userId}`}</p>
-            <p>Status: {loan.status}</p>
-            <p>Loan date: {new Date(loan.loanDate).toLocaleDateString()}</p>
-            <p>Due date: {new Date(loan.dueDate).toLocaleDateString()}</p>
+      <Card>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Input
+            placeholder="Search by user, email or book"
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setPage(1);
+            }}
+          />
 
-            {loan.returnedAt && (
-              <p>
-                Returned at: {new Date(loan.returnedAt).toLocaleDateString()}
-              </p>
-            )}
+          <Select
+            value={status}
+            onChange={(event) => {
+              setStatus(event.target.value as LoanStatus | "");
+              setPage(1);
+            }}
+          >
+            <option value="">All status</option>
+            <option value="ACTIVE">Active</option>
+            <option value="RETURNED">Returned</option>
+            <option value="LATE">Late</option>
+          </Select>
+        </div>
+      </Card>
 
-            {loan.status !== "RETURNED" && (
-              <button
-                type="button"
-                onClick={() => returnLoanMutation.mutate(loan.id)}
-                disabled={returnLoanMutation.isPending}
-              >
-                Return book
-              </button>
-            )}
-          </article>
-        ))}
-      </div>
+      {!data?.data.length ? (
+        <EmptyState message="No loans found." />
+      ) : (
+        <div className="space-y-4">
+          {data.data.map((loan) => (
+            <Card key={loan.id}>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {loan.bookTitle ?? `Book #${loan.bookId}`}
+                  </h2>
 
-      <div>
-        <button
-          type="button"
-          disabled={page === 1}
-          onClick={() => setPage((currentPage) => currentPage - 1)}
-        >
-          Previous
-        </button>
+                  <p className="text-sm text-gray-500">
+                    User: {loan.userName ?? `User #${loan.userId}`}
+                  </p>
 
-        <span>
-          Page {data?.pagination.page} of {data?.pagination.totalPages}
-        </span>
+                  <p className="text-sm text-gray-500">
+                    Due date: {new Date(loan.dueDate).toLocaleDateString()}
+                  </p>
+                </div>
 
-        <button
-          type="button"
-          disabled={
-            !data?.pagination.totalPages || page === data.pagination.totalPages
-          }
-          onClick={() => setPage((currentPage) => currentPage + 1)}
-        >
-          Next
-        </button>
-      </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                    {loan.status}
+                  </span>
+
+                  {loan.status !== "RETURNED" && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => returnLoanMutation.mutate(loan.id)}
+                      disabled={returnLoanMutation.isPending}
+                    >
+                      Return book
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <Card>
+        <div className="flex items-center justify-between">
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={page === 1}
+            onClick={() => setPage((currentPage) => currentPage - 1)}
+          >
+            Previous
+          </Button>
+
+          <span className="text-sm text-gray-600">
+            Page {data?.pagination.page} of {data?.pagination.totalPages}
+          </span>
+
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={
+              !data?.pagination.totalPages ||
+              page === data.pagination.totalPages
+            }
+            onClick={() => setPage((currentPage) => currentPage + 1)}
+          >
+            Next
+          </Button>
+        </div>
+      </Card>
     </section>
   );
 }
