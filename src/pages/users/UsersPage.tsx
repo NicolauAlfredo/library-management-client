@@ -20,6 +20,7 @@ import { Select } from "../../components/ui/Select";
 import type { Role, User } from "../../types/user";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
 import toast from "react-hot-toast";
+import { Users } from "lucide-react";
 
 export function UsersPage() {
   const queryClient = useQueryClient();
@@ -131,7 +132,11 @@ export function UsersPage() {
       )}
 
       {!data?.data.length ? (
-        <EmptyState message="No users found." />
+        <EmptyState
+          icon={<Users size={24} />}
+          title="No users found"
+          description="Try changing your search or role filter."
+        />
       ) : (
         <div className="space-y-4">
           {data.data.map((user) => (

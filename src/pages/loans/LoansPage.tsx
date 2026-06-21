@@ -20,6 +20,7 @@ import { Loading } from "../../components/ui/Loading";
 import { Select } from "../../components/ui/Select";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
 import toast from "react-hot-toast";
+import { BookOpen } from "lucide-react";
 
 export function LoansPage() {
   const queryClient = useQueryClient();
@@ -140,7 +141,11 @@ export function LoansPage() {
       )}
 
       {!data?.data.length ? (
-        <EmptyState message="No loans found." />
+        <EmptyState
+          icon={<BookOpen size={24} />}
+          title="No loans found"
+          description="There are no loans matching your filters."
+        />
       ) : (
         <div className="space-y-4">
           {data.data.map((loan) => (

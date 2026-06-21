@@ -21,6 +21,7 @@ import { Select } from "../../components/ui/Select";
 import type { Loan, LoanStatus } from "../../types/loan";
 
 import toast from "react-hot-toast";
+import { ClipboardList } from "lucide-react";
 
 export function MyLoansPage() {
   const queryClient = useQueryClient();
@@ -112,7 +113,11 @@ export function MyLoansPage() {
       )}
 
       {!data?.data.length ? (
-        <EmptyState message="You have no loans." />
+        <EmptyState
+          icon={<ClipboardList size={24} />}
+          title="No borrowed books"
+          description="Borrow a book from the catalog to see it here."
+        />
       ) : (
         <div className="space-y-4">
           {data.data.map((loan) => (

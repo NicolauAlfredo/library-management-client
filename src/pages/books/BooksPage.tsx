@@ -33,6 +33,7 @@ import { useAuth } from "../../contexts/auth.context";
 
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { BookOpen } from "lucide-react";
 
 export function BooksPage() {
   const [page, setPage] = useState(1);
@@ -286,7 +287,11 @@ export function BooksPage() {
       )}
 
       {!data?.data.length ? (
-        <EmptyState message="No books found." />
+        <EmptyState
+          icon={<BookOpen size={24} />}
+          title="No books found"
+          description="Try changing your filters or add a new book."
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {data.data.map((book) => (
